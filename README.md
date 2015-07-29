@@ -2,4 +2,7 @@
 Simple Build/Kill script for your sandbox server
 
 ## Console commands
-bk_prechangeteam_delay [delay]
+<b>bk_prechangeteam_delay</b> [delay]
+Changes the time you have to wait before choosing a new team
+<b>bk_postchangeteam_delay</b> [delay]
+Changes the time you have to wait after choosing a new team
