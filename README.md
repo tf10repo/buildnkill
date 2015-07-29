@@ -2,4 +2,4 @@
 Simple Build/Kill script for your sandbox server
 
 ## Console commands
-<b>bk_prechangeteam_delay <delay>
+bk_prechangeteam_delay [delay]
