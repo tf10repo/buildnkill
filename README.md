@@ -1,5 +1,5 @@
 ## Build/Kill
-Simple Build/Kill script for your sandbox server
+Simple Build/Kill script for your sandbox server.<br>Requires ULX Admin script to be installed.<br>http://ulyssesmod.net/downloads.php
 
 # Console commands
 <b>bk_prechangeteam_delay</b> [delay]<br>
