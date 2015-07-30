@@ -1,179 +1,174 @@
-local BK = {
-	Team = {}
-}
+if CLIENT or engine.ActiveGamemode() == "sandbox" then
+	local BK = {
+		Team = {}
+	}
 
-BK.Team.Builder = {
-	Name = "Builder",
-	Color = Color(50, 255, 50),
-	Noclip = true,
-	Damage = false
-}
+	BK.Team.Builder = {
+		Name = "Builder",
+		Color = Color(50, 255, 50),
+		Noclip = true,
+		Damage = false
+	}
 
-function BK.Team.Builder.OnSpawn(Player)
-	Player:GodEnable()
-end
-
-function BK.Team.Builder.OnLoadout(Player)
-	Player:StripWeapons()
-	Player:RemoveAllAmmo()
-
-	Player:Give("none")
-	Player:Give("weapon_physgun")
-	Player:Give("gmod_camera")
-	Player:Give("gmod_tool")
-end
-
-BK.Team.Fighter = {
-	Name = "Fighter",
-	Color = Color(255, 50, 50),
-	Noclip = false,
-	Damage = true
-}
-
-function BK.Team.Fighter.OnSpawn(Player)
-	Player:GodDisable()
-	Player:SetMoveType(MOVETYPE_WALK)
-	Player:SetRunSpeed(500)
-end
-
-function BK.Team.Fighter.OnLoadout(Player)
-	Player:StripWeapons()
-	Player:RemoveAllAmmo()
-
-	Player:Give("none")
-	Player:Give("weapon_crowbar")
-	Player:Give("weapon_physcannon")
-	Player:Give("weapon_physgun")
-	Player:Give("gmod_camera")
-	Player:Give("weapon_fists")
-	Player:Give("weapon_medkit")
-	Player:Give("weapon_stunstick")
-	Player:Give("weapon_pistol");	Player:GiveAmmo(144, "Pistol")
-	Player:Give("weapon_357");		Player:GiveAmmo(48, "357")
-	Player:Give("weapon_smg1");		Player:GiveAmmo(360, "SMG1");	Player:GiveAmmo(0, "SMG1_Grenade")
-	Player:Give("weapon_ar2");		Player:GiveAmmo(240, "AR2");	Player:GiveAmmo(3, "AR2AltFire")
-	Player:Give("weapon_shotgun");	Player:GiveAmmo(48, "Buckshot")
-	Player:Give("weapon_crossbow");	Player:GiveAmmo(10, "XBowBolt")
-	Player:Give("weapon_frag");		Player:GiveAmmo(5, "Grenade")
-	Player:Give("weapon_slam");		Player:GiveAmmo(3, "slam")
-	Player:Give("weapon_bugbait")
-end
-
-local PlayerENT = FindMetaTable("Player")
-
-function PlayerENT:GetBKTeam()
-	return BK.Team[self.BK_Team or "Builder"]
-end
-
-if SERVER then
-	local bk_prechangeteam_delay = CreateConVar("bk_prechange_team_delay", "10", {FCVAR_ARCHIVE})
-	local bk_postchangeteam_delay = CreateConVar("bk_postchange_team_delay", "3", {FCVAR_ARCHIVE})
-
-	function PlayerENT:SetBKTeam(Name)
-		local TeamTable = BK.Team[Name]
-		if not TeamTable then
-			return false
-		end
-
-		if self.BK_Team == Name then
-			ULib.tsay(self, "You're already in that team.", true)
-			return false
-		end
-
-		if not self.BK_LastChangeTeam or self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() < CurTime() then
-			self.BK_LastChangeTeam = CurTime()
-		else
-			ULib.tsay(self, "Wait "..math.ceil(self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() - CurTime()).."s before changing team again.")
-			return false
-		end
-		if bk_postchangeteam_delay:GetInt() > 0 then
-			ULib.tsay(self, "You will change your team to "..TeamTable.Name.." in "..bk_postchangeteam_delay:GetInt().." seconds")
-		end
-		timer.Create("bk_"..self:UniqueID(), bk_postchangeteam_delay:GetInt(), 1,
-			function ()
-				if self:IsValid() then
-					self.BK_Team = Name
-					TeamTable.OnLoadout(self)
-					TeamTable.OnSpawn(self)
-					ulx.fancyLogAdmin(self, "#A switched to team #s", Name)
-				end
-			end
-		)
-		self:StripWeapons()
-		self:RemoveAllAmmo()
+	function BK.Team.Builder.OnSpawn(Player)
+		Player:GodEnable()
 	end
 
-	hook.Add("PlayerShouldTakeDamage", "BK",
-		function (Player, Attacker)
-			if not IsValid(Player) or not Player:IsPlayer() then
-				return nil
-			elseif not IsValid(Attacker) or not Attacker:IsPlayer() then
-				return nil
-			elseif Player:GetBKTeam().Damage and Attacker:GetBKTeam().Damage then
+	function BK.Team.Builder.OnLoadout(Player)
+		Player:StripWeapons()
+		Player:RemoveAllAmmo()
+
+		Player:Give("none")
+		Player:Give("weapon_physgun")
+		Player:Give("gmod_camera")
+		Player:Give("gmod_tool")
+	end
+
+	BK.Team.Fighter = {
+		Name = "Fighter",
+		Color = Color(255, 50, 50),
+		Noclip = false,
+		Damage = true
+	}
+
+	function BK.Team.Fighter.OnSpawn(Player)
+		Player:GodDisable()
+		Player:SetMoveType(MOVETYPE_WALK)
+		Player:SetRunSpeed(500)
+	end
+
+	function BK.Team.Fighter.OnLoadout(Player)
+		Player:StripWeapons()
+		Player:RemoveAllAmmo()
+
+		Player:Give("none")
+		Player:Give("weapon_crowbar")
+		Player:Give("weapon_physcannon")
+		Player:Give("weapon_physgun")
+		Player:Give("gmod_camera")
+		Player:Give("weapon_fists")
+		Player:Give("weapon_medkit")
+		Player:Give("weapon_stunstick")
+		Player:Give("weapon_pistol");	Player:GiveAmmo(144, "Pistol")
+		Player:Give("weapon_357");		Player:GiveAmmo(48, "357")
+		Player:Give("weapon_smg1");		Player:GiveAmmo(360, "SMG1");	Player:GiveAmmo(0, "SMG1_Grenade")
+		Player:Give("weapon_ar2");		Player:GiveAmmo(240, "AR2");	Player:GiveAmmo(3, "AR2AltFire")
+		Player:Give("weapon_shotgun");	Player:GiveAmmo(48, "Buckshot")
+		Player:Give("weapon_crossbow");	Player:GiveAmmo(10, "XBowBolt")
+		Player:Give("weapon_frag");		Player:GiveAmmo(5, "Grenade")
+		Player:Give("weapon_slam");		Player:GiveAmmo(3, "slam")
+		Player:Give("weapon_bugbait")
+	end
+
+	local PlayerENT = FindMetaTable("Player")
+
+	function PlayerENT:GetBKTeam()
+		return BK.Team[self.BK_Team or "Builder"]
+	end
+
+	if SERVER then
+		local bk_prechangeteam_delay = CreateConVar("bk_prechange_team_delay", "10", {FCVAR_ARCHIVE})
+		local bk_postchangeteam_delay = CreateConVar("bk_postchange_team_delay", "3", {FCVAR_ARCHIVE})
+
+		function PlayerENT:SetBKTeam(Name)
+			local TeamTable = BK.Team[Name]
+			if not TeamTable then
+				return false
+			end
+
+			if self.BK_Team == Name then
+				ULib.tsay(self, "You're already in that team.", true)
+				return false
+			end
+
+			if not self.BK_LastChangeTeam or self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() < CurTime() then
+				self.BK_LastChangeTeam = CurTime()
+			else
+				ULib.tsay(self, "Wait "..math.ceil(self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() - CurTime()).."s before changing team again.")
+				return false
+			end
+			if bk_postchangeteam_delay:GetInt() > 0 then
+				ULib.tsay(self, "You will change your team to "..TeamTable.Name.." in "..bk_postchangeteam_delay:GetInt().." seconds")
+			end
+			timer.Create("bk_"..self:UniqueID(), bk_postchangeteam_delay:GetInt(), 1,
+				function ()
+					if self:IsValid() then
+						self.BK_Team = Name
+						TeamTable.OnLoadout(self)
+						TeamTable.OnSpawn(self)
+						ulx.fancyLogAdmin(self, "#A switched to team #s", Name)
+					end
+				end
+			)
+			self:StripWeapons()
+			self:RemoveAllAmmo()
+		end
+
+		hook.Add("PlayerShouldTakeDamage", "BK",
+			function (Player, Attacker)
+				if not IsValid(Player) or not Player:IsPlayer() then
+					return nil
+				elseif not IsValid(Attacker) or not Attacker:IsPlayer() then
+					return nil
+				elseif Player:GetBKTeam().Damage and Attacker:GetBKTeam().Damage then
+					return true
+				end
+				return false
+			end
+		)
+
+		hook.Add("PlayerSpawn", "BK",
+			function (Player)
+				Player:GetBKTeam().OnSpawn(Player)
+			end
+		)
+
+		hook.Add("PlayerLoadout", "BK",
+			function (Player)
+				Player:GetBKTeam().OnLoadout(Player)
+			end
+		)
+
+		hook.Add("ULibLocalPlayerReady", "BK",
+			function(Player)
+				Player:ConCommand("choosebkteam")
+			end
+		)
+	end
+
+	hook.Add("PlayerNoClip", "BK",
+		function (Player, Active)
+			if not Active then
+				return true
+			elseif Player:GetBKTeam().Noclip then
 				return true
 			end
 			return false
 		end
 	)
 
-	hook.Add("PlayerSpawn", "BK",
-		function (Player)
-			Player:GetBKTeam().OnSpawn(Player)
-		end
-	)
-
-	hook.Add("PlayerLoadout", "BK",
-		function (Player)
-			Player:GetBKTeam().OnLoadout(Player)
-		end
-	)
-
-	hook.Add("ULibLocalPlayerReady", "BK",
-		function(Player)
-			Player:ConCommand("choosebkteam")
-		end
-	)
-end
-
-hook.Add("PlayerNoClip", "BK",
-	function (Player, Active)
-		if not Active then
-			return true
-		elseif Player:GetBKTeam().Noclip then
-			return true
-		end
-		return false
+	function BK.Build(Player)
+		Player:SetBKTeam("Builder")
 	end
-)
 
-function BK.Build(Player)
-	Player:SetBKTeam("Builder")
+	function BK.Fight(Player)
+		Player:SetBKTeam("Fighter")
+	end
+
+	local BuildCommand = ulx.command("Fun", "ulx build", BK.Build, "!build")
+	FightCommand:defaultAccess(ULib.ACCESS_ALL)
+	FightCommand:help("Switch team to Builder")
+
+	local FightCommand = ulx.command("Fun", "ulx fight", BK.Fight, "!fight")
+	FightCommand:defaultAccess(ULib.ACCESS_ALL)
+	FightCommand:help("Switch team to Fighter")
 end
-
-function BK.Fight(Player)
-	Player:SetBKTeam("Fighter")
-end
-
-local Builder = ulx.command("Fun", "ulx build", BK.Build, "!build")
-	Builder:defaultAccess(ULib.ACCESS_ALL)
-	Builder:help("Switch team to Builder")
-
-local Fighter = ulx.command("Fun", "ulx fight", BK.Fight, "!fight")
-	Fighter:defaultAccess(ULib.ACCESS_ALL)
-	Fighter:help("Switch team to Fighter")
 
 if CLIENT then
 	surface.CreateFont("SmallFont", {font = "roboto", size = 24})
 	surface.CreateFont("MediumFont", {font = "roboto", size = 32})
 	surface.CreateFont("BigFont", {font = "roboto", size = 64})
 	surface.CreateFont("HudFont", {font = "Arial", size = 16, weight = 500, antialias 	= true, additive = true})
-
-	local function PaintMenu(self, w, h)
-		surface.SetDrawColor(Color(100, 100, 170, 255))
-		surface.DrawRect(1, 1, w-2, h-2)
-		surface.SetDrawColor(Color(48, 48, 48, 255))
-		surface.DrawOutlinedRect(0, 0, w, h)
-	end
 
 	concommand.Add("choosebkteam",
 		function()
@@ -185,7 +180,12 @@ if CLIENT then
 			Picker:SetVisible(true)
 			Picker:Center()
 			Picker:MakePopup()
-			Picker.Paint = PaintMenu
+			function Picker:Paint(w, h)
+				surface.SetDrawColor(Color(100, 100, 170, 255))
+				surface.DrawRect(1, 1, w - 2, h - 2)
+				surface.SetDrawColor(Color(48, 48, 48, 255))
+				surface.DrawOutlinedRect(0, 0, w, h)
+			end
 
 			local Caption = vgui.Create("DLabel", Picker)
 			Caption:SetText("Select your team")
@@ -195,13 +195,23 @@ if CLIENT then
 			Caption:SizeToContents()
 			Caption:SetTall(48)
 			Caption:Dock(TOP)
-			Caption.Paint = PaintMenu
+			function Caption:Paint(w, h)
+				surface.SetDrawColor(Color(100, 100, 170, 255))
+				surface.DrawRect(1, 1, w - 2, h - 2)
+				surface.SetDrawColor(Color(48, 48, 48, 255))
+				surface.DrawOutlinedRect(0, 0, w, h)
+			end
 
 			local Divider = vgui.Create("DHorizontalDivider", Picker)
 			Divider:Dock(FILL)
 
 			local BuilderPanel = vgui.Create("DPanel", Divider)
-			BuilderPanel.Paint = PaintMenu
+			function BuilderPanel:Paint(w, h)
+				surface.SetDrawColor(Color(100, 100, 170, 255))
+				surface.DrawRect(1, 1, w - 2, h - 2)
+				surface.SetDrawColor(Color(48, 48, 48, 255))
+				surface.DrawOutlinedRect(0, 0, w, h)
+			end
 
 			local BuilderButton = vgui.Create("DButton", BuilderPanel)
 			BuilderButton:Dock(TOP)
@@ -242,7 +252,12 @@ if CLIENT then
 			BuilderLabel3:Dock(TOP)
 
 			local FighterPanel = vgui.Create("DPanel", Divider)
-			FighterPanel.Paint = defaultPaint
+			function FigtherPanel:Paint(w, h)
+				surface.SetDrawColor(Color(100, 100, 170, 255))
+				surface.DrawRect(1, 1, w - 2, h - 2)
+				surface.SetDrawColor(Color(48, 48, 48, 255))
+				surface.DrawOutlinedRect(0, 0, w, h)
+			end
 
 			local FighterButton = vgui.Create("DButton", FighterPanel)
 			FighterButton:Dock(TOP)
@@ -285,7 +300,13 @@ if CLIENT then
 			Divider:SetLeft(BuilderPanel)
 			Divider:SetRight(FighterPanel)
 			Divider:SetDividerWidth(0)
-			Divider.Paint = PaintMenu
+			function Divider:Paint(w, h)
+				surface.SetDrawColor(Color(100, 100, 170, 255))
+				surface.DrawRect(1, 1, w - 2, h - 2)
+				surface.SetDrawColor(Color(48, 48, 48, 255))
+				surface.DrawOutlinedRect(0, 0, w, h)
+			end
+
 			function Divider:Think()
 				self:SetLeftWidth(self:GetWide()/2)
 			end
@@ -298,7 +319,12 @@ if CLIENT then
 			Footer:SizeToContents()
 			Footer:SetTall(32)
 			Footer:Dock(BOTTOM)
-			Footer.Paint = PaintMenu
+			function Footer:Paint(w, h)
+				surface.SetDrawColor(Color(100, 100, 170, 255))
+				surface.DrawRect(1, 1, w - 2, h - 2)
+				surface.SetDrawColor(Color(48, 48, 48, 255))
+				surface.DrawOutlinedRect(0, 0, w, h)
+			end
 		end
 	)
 
