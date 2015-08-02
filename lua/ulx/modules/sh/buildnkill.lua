@@ -1,5 +1,7 @@
-if CLIENT or engine.ActiveGamemode() == "sandbox" then
-	local BK = {
+AddCSLuaFile()
+
+if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
+	BK = {
 		Team = {}
 	}
 
