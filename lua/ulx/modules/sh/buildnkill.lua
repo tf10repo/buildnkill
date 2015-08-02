@@ -349,32 +349,34 @@ if CLIENT then
 		end
 	)
 
-	hook.Add("HUDPaint", "BK", function()
-		local Position = LocalPlayer():GetPos()
-		for _, Player in pairs(player.GetAll()) do
-			if Player == LocalPlayer() and not Player:ShouldDrawLocalPlayer() then
-				continue
-			elseif not Player:Alive() then
-				continue
-			end
+	hook.Add("HUDPaint", "BK",
+		function ()
+			local Position = LocalPlayer():GetPos()
+			for _, Player in pairs(player.GetAll()) do
+				if Player == LocalPlayer() and not Player:ShouldDrawLocalPlayer() then
+					continue
+				elseif not Player:Alive() then
+					continue
+				end
 
-			local PlayerPosition = Player:GetPos()
-			local Alpha = math.Clamp(3500 - Position:Distance(PlayerPosition), 0, 510)
-			if Alpha > 0 then
-				local WorldPosition = PlayerPosition + Vector(0, 0, 80)
-				local ScreenPosition = WorldPosition:ToScreen()
-				if ScreenPosition.visible then
-					draw.SimpleTextOutlined(
-						Player:GetBKTeam().Name,
-						"HudFont",
-						ScreenPosition.x,
-						ScreenPosition.y - 50,
-						ColorAlpha(Player:GetBKTeam().Color, Alpha),
-						TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 1,
-						Color(0, 0, 0, alpha)
-					)
+				local PlayerPosition = Player:GetPos()
+				local Alpha = math.Clamp(3500 - Position:Distance(PlayerPosition), 0, 510)
+				if Alpha > 0 then
+					local WorldPosition = PlayerPosition + Vector(0, 0, 80)
+					local ScreenPosition = WorldPosition:ToScreen()
+					if ScreenPosition.visible then
+						draw.SimpleTextOutlined(
+							Player:GetBKTeam().Name,
+							"HudFont",
+							ScreenPosition.x,
+							ScreenPosition.y - 50,
+							ColorAlpha(Player:GetBKTeam().Color, Alpha/2),
+							TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 1,
+							Color(0, 0, 0, Alpha/2)
+						)
+					end
 				end
 			end
 		end
-	end)
+	)
 end
