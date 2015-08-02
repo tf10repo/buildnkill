@@ -13,4 +13,4 @@ Pushes you to the builder team<br>
 <b>!fight</b><br>
 Pushes you to the fighter team
 # Additional note
-Don't forget to add the permissions to the !build and !fight commands from the ULX menu.
+Don't forget to add the permissions to the !build and !fight commands from the Ulysses Mod admin menu.
