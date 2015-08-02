@@ -62,10 +62,26 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 		Player:Give("weapon_bugbait")
 	end
 
+	BK.Team.Joining = {
+		Name = "Joining",
+		Color = Color(0, 0, 0),
+		Noclip = false,
+		Damage = false
+	}
+
+	function BK.Team.Joining.OnSpawn(Player)
+		Player:GodEnable()
+	end
+
+	function BK.Team.Joining.OnLoadout(Player)
+		Player:StripWeapons()
+		Player:RemoveAllAmmo()
+	end
+
 	local PlayerENT = FindMetaTable("Player")
 
 	function PlayerENT:GetBKTeam()
-		return BK.Team[self.BK_Team or "Builder"]
+		return BK.Team[self.BK_Team or "Joining"]
 	end
 
 	if SERVER then
@@ -108,14 +124,17 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 
 		hook.Add("PlayerShouldTakeDamage", "BK",
 			function (Player, Attacker)
-				if not IsValid(Player) or not Player:IsPlayer() then
-					return nil
-				elseif not IsValid(Attacker) or not Attacker:IsPlayer() then
-					return nil
-				elseif Player:GetBKTeam().Damage and Attacker:GetBKTeam().Damage then
-					return true
+				if IsValid(Player) and Player:IsPlayer() then
+					if not Player:GetBKTeam().Damage then
+						return false
+					end
 				end
-				return false
+				if IsValid(Attacker) and Attacker:IsPlayer() then
+					if not Attacker:GetBKTeam().Damage then
+						return false
+					end
+				end
+				return true
 			end
 		)
 
@@ -158,8 +177,8 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 	end
 
 	local BuildCommand = ulx.command("Fun", "ulx build", BK.Build, "!build")
-	FightCommand:defaultAccess(ULib.ACCESS_ALL)
-	FightCommand:help("Switch team to Builder")
+	BuildCommand:defaultAccess(ULib.ACCESS_ALL)
+	BuildCommand:help("Switch team to Builder")
 
 	local FightCommand = ulx.command("Fun", "ulx fight", BK.Fight, "!fight")
 	FightCommand:defaultAccess(ULib.ACCESS_ALL)
@@ -254,7 +273,7 @@ if CLIENT then
 			BuilderLabel3:Dock(TOP)
 
 			local FighterPanel = vgui.Create("DPanel", Divider)
-			function FigtherPanel:Paint(w, h)
+			function FighterPanel:Paint(w, h)
 				surface.SetDrawColor(Color(100, 100, 170, 255))
 				surface.DrawRect(1, 1, w - 2, h - 2)
 				surface.SetDrawColor(Color(48, 48, 48, 255))
