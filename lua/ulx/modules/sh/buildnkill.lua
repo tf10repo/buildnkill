@@ -354,7 +354,7 @@ if CLIENT then
 		for _, Player in pairs(player.GetAll()) do
 			if Player == LocalPlayer() and not Player:ShouldDrawLocalPlayer() then
 				continue
-			elseif not ply:Alive() then
+			elseif not Player:Alive() then
 				continue
 			end
 
