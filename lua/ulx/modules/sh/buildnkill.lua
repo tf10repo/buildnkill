@@ -64,7 +64,7 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 
 	BK.Team.Joining = {
 		Name = "Joining",
-		Color = Color(0, 0, 0),
+		Color = Color(255, 255, 0),
 		Noclip = false,
 		Damage = false
 	}
@@ -81,81 +81,80 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 	local PlayerENT = FindMetaTable("Player")
 
 	function PlayerENT:GetBKTeam()
-		return BK.Team[self.BK_Team or "Joining"]
+		return BK.Team[self:GetNWString("BK_Team", "Joining") or "Joining"]
 	end
 
-	if SERVER then
-		local bk_prechangeteam_delay = CreateConVar("bk_prechange_team_delay", "10", {FCVAR_ARCHIVE})
-		local bk_postchangeteam_delay = CreateConVar("bk_postchange_team_delay", "3", {FCVAR_ARCHIVE})
+	local bk_prechangeteam_delay = CreateConVar("bk_prechange_team_delay", "10", {FCVAR_ARCHIVE})
+	local bk_postchangeteam_delay = CreateConVar("bk_postchange_team_delay", "3", {FCVAR_ARCHIVE})
 
-		function PlayerENT:SetBKTeam(Name)
-			local TeamTable = BK.Team[Name]
-			if not TeamTable then
-				return false
-			end
-
-			if self.BK_Team == Name then
-				ULib.tsay(self, "You're already in that team.", true)
-				return false
-			end
-
-			if not self.BK_LastChangeTeam or self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() < CurTime() then
-				self.BK_LastChangeTeam = CurTime()
-			else
-				ULib.tsay(self, "Wait "..math.ceil(self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() - CurTime()).."s before changing team again.")
-				return false
-			end
-			if bk_postchangeteam_delay:GetInt() > 0 then
-				ULib.tsay(self, "You will change your team to "..TeamTable.Name.." in "..bk_postchangeteam_delay:GetInt().." seconds")
-			end
-			timer.Create("bk_"..self:UniqueID(), bk_postchangeteam_delay:GetInt(), 1,
-				function ()
-					if self:IsValid() then
-						self.BK_Team = Name
-						TeamTable.OnLoadout(self)
-						TeamTable.OnSpawn(self)
-						ulx.fancyLogAdmin(self, "#A switched to team #s", Name)
-					end
-				end
-			)
-			self:StripWeapons()
-			self:RemoveAllAmmo()
+	function PlayerENT:SetBKTeam(Name)
+		local TeamTable = BK.Team[Name]
+		if not TeamTable then
+			return false
 		end
 
-		hook.Add("PlayerShouldTakeDamage", "BK",
-			function (Player, Attacker)
-				if IsValid(Player) and Player:IsPlayer() then
-					if not Player:GetBKTeam().Damage then
-						return false
-					end
+		local Team = self:GetNWString("BK_Team", "Joining") or "Joining"
+		if Team == Name then
+			ULib.tsay(self, "You're already in that team.", true)
+			return false
+		end
+
+		if not self.BK_LastChangeTeam or self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() < CurTime() then
+			self.BK_LastChangeTeam = CurTime()
+		else
+			ULib.tsay(self, "Wait "..math.ceil(self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() - CurTime()).."s before changing team again.")
+			return false
+		end
+		if bk_postchangeteam_delay:GetInt() > 0 then
+			ULib.tsay(self, "You will change your team to "..TeamTable.Name.." in "..bk_postchangeteam_delay:GetInt().." seconds")
+		end
+		timer.Create("bk_"..self:UniqueID(), bk_postchangeteam_delay:GetInt(), 1,
+			function ()
+				if self:IsValid() then
+					self:SetNWString("BK_Team", Name)
+					TeamTable.OnLoadout(self)
+					TeamTable.OnSpawn(self)
+					ulx.fancyLogAdmin(self, "#A switched to team #s", Name)
 				end
-				if IsValid(Attacker) and Attacker:IsPlayer() then
-					if not Attacker:GetBKTeam().Damage then
-						return false
-					end
-				end
-				return true
 			end
 		)
-
-		hook.Add("PlayerSpawn", "BK",
-			function (Player)
-				Player:GetBKTeam().OnSpawn(Player)
-			end
-		)
-
-		hook.Add("PlayerLoadout", "BK",
-			function (Player)
-				Player:GetBKTeam().OnLoadout(Player)
-			end
-		)
-
-		hook.Add("ULibLocalPlayerReady", "BK",
-			function(Player)
-				Player:ConCommand("choosebkteam")
-			end
-		)
+		self:StripWeapons()
+		self:RemoveAllAmmo()
 	end
+
+	hook.Add("PlayerShouldTakeDamage", "BK",
+		function (Player, Attacker)
+			if IsValid(Player) and Player:IsPlayer() then
+				if not Player:GetBKTeam().Damage then
+					return false
+				end
+			end
+			if IsValid(Attacker) and Attacker:IsPlayer() then
+				if not Attacker:GetBKTeam().Damage then
+					return false
+				end
+			end
+			return true
+		end
+	)
+
+	hook.Add("PlayerSpawn", "BK",
+		function (Player)
+			Player:GetBKTeam().OnSpawn(Player)
+		end
+	)
+
+	hook.Add("PlayerLoadout", "BK",
+		function (Player)
+			Player:GetBKTeam().OnLoadout(Player)
+		end
+	)
+
+	hook.Add("ULibLocalPlayerReady", "BK",
+		function(Player)
+			Player:ConCommand("choosebkteam")
+		end
+	)
 
 	hook.Add("PlayerNoClip", "BK",
 		function (Player, Active)
@@ -360,7 +359,7 @@ if CLIENT then
 				end
 
 				local PlayerPosition = Player:GetPos()
-				local Alpha = math.Clamp(3500 - Position:Distance(PlayerPosition), 0, 510)
+				local Alpha = math.Clamp(3500 - Position:Distance(PlayerPosition), 0, 1020) / 4
 				if Alpha > 0 then
 					local WorldPosition = PlayerPosition + Vector(0, 0, 80)
 					local ScreenPosition = WorldPosition:ToScreen()
@@ -370,9 +369,9 @@ if CLIENT then
 							"HudFont",
 							ScreenPosition.x,
 							ScreenPosition.y - 50,
-							ColorAlpha(Player:GetBKTeam().Color, Alpha/2),
+							ColorAlpha(Player:GetBKTeam().Color, Alpha),
 							TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 1,
-							Color(0, 0, 0, Alpha/2)
+							Color(0, 0, 0, Alpha)
 						)
 					end
 				end
