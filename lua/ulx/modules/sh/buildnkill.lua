@@ -30,7 +30,8 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 		Name = "Fighter",
 		Color = Color(255, 50, 50),
 		Noclip = false,
-		Damage = true
+		Damage = true,
+		TraceRequired = true,
 	}
 
 	function BK.Team.Fighter.OnSpawn(Player)
@@ -358,14 +359,28 @@ if CLIENT then
 					continue
 				end
 
+				local Team = Player:GetBKTeam()
 				local PlayerPosition = Player:GetPos()
+				if Team.TraceRequired then
+					local TraceResult = util.TraceHull {
+						start = EyePos(),
+						endpos = PlayerPosition,
+						filter = {Player, Player:GetVehicle()},
+						mins = Player:OBBMins(),
+						maxs = Player:OBBMaxs(),
+					}
+					if TraceResult.Hit then
+						continue
+					end
+				end
+
 				local Alpha = math.Clamp(3500 - Position:Distance(PlayerPosition), 0, 1020) / 4
 				if Alpha > 0 then
 					local WorldPosition = PlayerPosition + Vector(0, 0, 80)
 					local ScreenPosition = WorldPosition:ToScreen()
 					if ScreenPosition.visible then
 						draw.SimpleTextOutlined(
-							Player:GetBKTeam().Name,
+							Team.Name,
 							"HudFont",
 							ScreenPosition.x,
 							ScreenPosition.y - 50,
