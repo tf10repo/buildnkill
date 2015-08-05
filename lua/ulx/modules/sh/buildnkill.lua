@@ -362,10 +362,10 @@ if CLIENT then
 				local Team = Player:GetBKTeam()
 				local PlayerPosition = Player:GetPos()
 				if Team.TraceRequired then
-					local TraceResult = util.TraceHull {
+					local TraceResult = util.TraceLine {
 						start = EyePos(),
-						endpos = PlayerPosition,
-						filter = {Player, Player:GetVehicle()},
+						endpos = Player:LocalToWorld(Vector(0, 0, 10)),
+						filter = {Player, LocalPlayer(), Player:GetVehicle()},
 						mins = Player:OBBMins(),
 						maxs = Player:OBBMaxs(),
 					}
@@ -374,7 +374,8 @@ if CLIENT then
 					end
 				end
 
-				local Alpha = math.Clamp(3500 - Position:Distance(PlayerPosition), 0, 1020) / 4
+				local Clr = Player:GetColor()
+				local Alpha = math.Clamp(3500 - Position:Distance(PlayerPosition), 0, 1020) / 4 * Clr.a / 255
 				if Alpha > 0 then
 					local WorldPosition = PlayerPosition + Vector(0, 0, 80)
 					local ScreenPosition = WorldPosition:ToScreen()
