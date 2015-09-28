@@ -8,9 +8,9 @@ Changes the time you have to wait before choosing a new team<br><br>
 Changes the time you have to wait after choosing a new team
 
 ### Chat commands
-<b>!build</b><br>
+<b>!builder</b><br>
 Pushes you to the builder team<br>
-<b>!fight</b><br>
+<b>!fighter</b><br>
 Pushes you to the fighter team
 ### Additional note
 Don't forget to add the permissions to the !build and !fight commands from the Ulysses Mod admin menu.
