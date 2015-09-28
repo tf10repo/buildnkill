@@ -176,11 +176,11 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 		Player:SetBKTeam("Fighter")
 	end
 
-	local BuildCommand = ulx.command("Fun", "ulx build", BK.Build, "!build")
+	local BuildCommand = ulx.command("Fun", "ulx builder", BK.Build, "!builder")
 	BuildCommand:defaultAccess(ULib.ACCESS_ALL)
 	BuildCommand:help("Switch team to Builder")
 
-	local FightCommand = ulx.command("Fun", "ulx fight", BK.Fight, "!fight")
+	local FightCommand = ulx.command("Fun", "ulx fighter", BK.Fight, "!fighter")
 	FightCommand:defaultAccess(ULib.ACCESS_ALL)
 	FightCommand:help("Switch team to Fighter")
 end
@@ -241,7 +241,7 @@ if CLIENT then
 			BuilderButton:SetFont("BigFont")
 			BuilderButton:SetTall(80)
 			function BuilderButton.DoClick(self)
-				RunConsoleCommand("ulx", "build")
+				RunConsoleCommand("ulx", "builder")
 				Picker:Remove()
 			end
 
@@ -287,7 +287,7 @@ if CLIENT then
 			FighterButton:SetFont("BigFont")
 			FighterButton:SetTall(80)
 			function FighterButton.DoClick(self)
-				RunConsoleCommand("ulx", "fight")
+				RunConsoleCommand("ulx", "fighter")
 				Picker:Remove()
 			end
 
@@ -333,7 +333,7 @@ if CLIENT then
 			end
 
 			local Footer = vgui.Create("DLabel", Picker)
-			Footer:SetText("Use !build or !kill to change teams again")
+			Footer:SetText("Use !builder or !fighter to change teams again")
 			Footer:SetColor(Color(255, 255, 0))
 			Footer:SetFont("SmallFont")
 			Footer:SetContentAlignment(5)
