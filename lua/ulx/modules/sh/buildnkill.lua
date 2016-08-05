@@ -148,6 +148,7 @@ if CLIENT or engine.ActiveGamemode():lower() == "sandbox" then
 	hook.Add("PlayerLoadout", "BK",
 		function (Player)
 			Player:GetBKTeam().OnLoadout(Player)
+			return true
 		end
 	)
 
