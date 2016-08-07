@@ -16,16 +16,16 @@ function Player:SetBKTeam(Name)
 		return false
 	end
 
-	if not self.BK_LastChangeTeam or self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() < CurTime() then
+	if not self.BK_LastChangeTeam or self.BK_LastChangeTeam + BK.prechangeteam_delay:GetInt() < CurTime() then
 		self.BK_LastChangeTeam = CurTime()
 	else
-		ULib.tsay(self, "Wait "..math.ceil(self.BK_LastChangeTeam + bk_prechangeteam_delay:GetInt() - CurTime()).."s before changing team again.")
+		ULib.tsay(self, "Wait "..math.ceil(self.BK_LastChangeTeam + BK.prechangeteam_delay:GetInt() - CurTime()).."s before changing team again.")
 		return false
 	end
-	if bk_postchangeteam_delay:GetInt() > 0 then
-		ULib.tsay(self, "You will change your team to "..TeamTable.Name.." in "..bk_postchangeteam_delay:GetInt().." seconds")
+	if BK.postchangeteam_delay:GetInt() > 0 then
+		ULib.tsay(self, "You will change your team to "..TeamTable.Name.." in "..BK.postchangeteam_delay:GetInt().." seconds")
 	end
-	timer.Create("bk_"..self:UniqueID(), bk_postchangeteam_delay:GetInt(), 1,
+	timer.Create("bk_"..self:UniqueID(), BK.postchangeteam_delay:GetInt(), 1,
 		function ()
 			if self:IsValid() then
 				self:SetNWString("BK_Team", Name)
