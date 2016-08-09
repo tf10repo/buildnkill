@@ -1,7 +1,7 @@
 local Player = FindMetaTable("Player")
 
 function Player:GetBKTeam()
-	return BK.Team[self:GetNWString("BK_Team") or "Joining"]
+	return BK.Team[self:GetNWString("BK_Team", "Joining")]
 end
 
 function Player:SetBKTeam(Name)
